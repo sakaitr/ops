@@ -45,12 +45,13 @@ jobs:
               curl -fsSL https://rpm.nodesource.com/setup_20.x | bash - >/dev/null 2>&1
               dnf install -y -q nodejs
               node --version
-              cd /workspace/.next/standalone/node_modules/better-sqlite3
+              # Build from the full source in the original node_modules (has binding.gyp)
+              cd /workspace/node_modules/better-sqlite3
               npm rebuild --build-from-source 2>&1
               cp build/Release/better_sqlite3.node /workspace/bsq_compiled.node
               echo "Binary built: $(file /workspace/bsq_compiled.node)"
             '
-          # Replace ALL copies (node_modules/ AND .next/node_modules/ bundled copy)
+          # Replace ALL copies in standalone (node_modules/ AND .next/ bundled copies)
           find .next/standalone -name "better_sqlite3.node" -exec cp bsq_compiled.node {} \;
           echo "Replaced binaries:"
           find .next/standalone -name "better_sqlite3.node"
