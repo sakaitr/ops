@@ -3,6 +3,7 @@ import { getDb } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 import { hashPassword } from "@/lib/auth";
 import { nowIso } from "@/lib/time";
+import { logAudit } from "@/lib/audit";
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -71,6 +72,17 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
     values.push(id);
     db.prepare(`UPDATE users SET ${fields.join(", ")} WHERE id = ?`).run(...values);
+
+    // Audit log
+    if (password) {
+      logAudit(db, { actorUserId: user.id, action: "password_change", entityType: "user", entityId: id });
+    }
+    if (role) {
+      logAudit(db, { actorUserId: user.id, action: "role_change", entityType: "user", entityId: id, details: { role } });
+    }
+    if (is_active !== undefined) {
+      logAudit(db, { actorUserId: user.id, action: is_active ? "user_activate" : "user_deactivate", entityType: "user", entityId: id });
+    }
 
     return NextResponse.json({ ok: true });
   } catch {

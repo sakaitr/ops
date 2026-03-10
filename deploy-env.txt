@@ -1,7 +1,9 @@
 # cPanel Node.js App için ortam değişkenleri
 # cPanel → Node.js App → Environment Variables bölümüne ekleyin
 
-DATABASE_PATH=./data/opsdesk.sqlite
+# ÖNEMLİ: Mutlak yol kullanın — göreceli yol standalone modda farklı dizine işaret edebilir!
+# cPanel'de genellikle: /home/<kullanici>/ops/data/opsdesk.sqlite
+DATABASE_PATH=/home/KULLANICI_ADINIZ/ops/data/opsdesk.sqlite
 SESSION_TTL_HOURS=168
 COOKIE_NAME=opsdesk_session
 COOKIE_SECURE=true

@@ -6,20 +6,56 @@ import { runMigrations } from "./migrate";
 let dbInstance: Database.Database | null = null;
 let migrationsRun = false;
 
+// Proje kökünü bul: bu dosya lib/ altında, bir üst dizin proje köküdür.
+// Standalone build veya cPanel gibi ortamlarda process.cwd() güvenilir olmayabileceğinden
+// önce __dirname bazlı yolu dene, yoksa process.cwd() bazlı yolu kullan.
+function findProjectRoot(): string {
+  // __dirname: derleme sonrasında lib/ (veya Next.js bundler eşdeğeri)
+  const fromDirname = path.resolve(__dirname, "..");
+  // process.cwd() bazlı
+  const fromCwd = process.cwd();
+
+  // Proje kökünü belirlemek için package.json varlığını kontrol et
+  for (const candidate of [fromDirname, fromCwd]) {
+    try {
+      if (fs.existsSync(path.join(candidate, "package.json"))) {
+        return candidate;
+      }
+    } catch { /* ignore */ }
+  }
+  return fromCwd;
+}
+
 function resolveDatabasePath() {
-  const raw = process.env.DATABASE_PATH || "./data/opsdesk.sqlite";
-  const absolutePath = path.isAbsolute(raw)
-    ? raw
-    : path.join(process.cwd(), raw);
+  const raw = process.env.DATABASE_PATH;
+
+  if (raw) {
+    // Kullanıcı tarafından verilmişse: mutlaksa kullan, göreceliyse proje kökünden çöz
+    const absolutePath = path.isAbsolute(raw)
+      ? raw
+      : path.join(findProjectRoot(), raw);
+    const dir = path.dirname(absolutePath);
+    try {
+      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    } catch (error) {
+      console.error("Failed to create database directory:", error);
+      throw new Error(`Database directory creation failed: ${dir}`);
+    }
+    console.log("[DB] DATABASE_PATH (env):", absolutePath);
+    return absolutePath;
+  }
+
+  // Varsayılan: proje köküne göre data/opsdesk.sqlite
+  const projectRoot = findProjectRoot();
+  const absolutePath = path.join(projectRoot, "data", "opsdesk.sqlite");
   const dir = path.dirname(absolutePath);
   try {
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
   } catch (error) {
     console.error("Failed to create database directory:", error);
     throw new Error(`Database directory creation failed: ${dir}`);
   }
+  console.log("[DB] DATABASE_PATH (default, project root):", absolutePath);
   return absolutePath;
 }
 
