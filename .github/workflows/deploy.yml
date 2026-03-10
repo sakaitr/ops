@@ -33,6 +33,14 @@ jobs:
           cp -r public .next/standalone/public
           cp -r .next/static .next/standalone/.next/static
 
+      # better-sqlite3'ü prebuilt binary ile değiştir (glibc uyumluluğu için)
+      - name: Replace better-sqlite3 with prebuilt binary (Node 20 ABI 115)
+        run: |
+          curl -L -o bsq.tar.gz "https://github.com/WiseLibs/better-sqlite3/releases/download/v11.10.0/better-sqlite3-v11.10.0-node-v115-linux-x64.tar.gz"
+          tar -xzf bsq.tar.gz
+          cp build/Release/better_sqlite3.node .next/standalone/node_modules/better-sqlite3/build/Release/better_sqlite3.node
+          echo "Binary replaced: $(file build/Release/better_sqlite3.node)"
+
       - name: Prepare data directory placeholder
         run: mkdir -p .next/standalone/data
 
