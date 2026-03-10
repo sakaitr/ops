@@ -48,5 +48,6 @@ data/*.sqlite-wal
 # Deploy artifacts
 bsq-extract/
 bsq-linux.tar.gz
+bsq-linux-v20.tar.gz
 ops-cpanel.zip
 ops-deploy.zip
