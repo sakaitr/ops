@@ -1,0 +1,8 @@
+
+✅ HTTPS Proxy çalışıyor
+   Dışarıya açık : https://212.64.201.208:3000
+   → Next.js     : http://127.0.0.1:3001
+
+⚠️  Tarayıcıda ilk açılışta "Güvenli değil" uyarısı çıkacak.
+   cert.pem cihaza güvenilir kök CA olarak yüklendikten sonra PWA kurulumu çalışır.
+

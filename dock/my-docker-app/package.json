@@ -1,0 +1,23 @@
+{
+  "name": "my-docker-app",
+  "version": "1.0.0",
+  "description": "A sample application running in Docker",
+  "main": "src/app.ts",
+  "scripts": {
+    "start": "ts-node src/app.ts",
+    "build": "tsc",
+    "docker:build": "docker build -t my-docker-app .",
+    "docker:run": "docker run -p 3000:3000 my-docker-app"
+  },
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "typescript": "^4.5.4",
+    "ts-node": "^10.4.0",
+    "@types/node": "^16.11.7",
+    "@types/express": "^4.17.13"
+  },
+  "author": "Your Name",
+  "license": "MIT"
+}

@@ -39,3 +39,14 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# SQLite database files (cPanel'de kalır, repo'ya alınmaz)
+data/*.sqlite
+data/*.sqlite-shm
+data/*.sqlite-wal
+
+# Deploy artifacts
+bsq-extract/
+bsq-linux.tar.gz
+ops-cpanel.zip
+ops-deploy.zip

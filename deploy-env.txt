@@ -1,0 +1,12 @@
+# cPanel Node.js App için ortam değişkenleri
+# cPanel → Node.js App → Environment Variables bölümüne ekleyin
+
+DATABASE_PATH=./data/opsdesk.sqlite
+SESSION_TTL_HOURS=168
+COOKIE_NAME=opsdesk_session
+COOKIE_SECURE=true
+SEED_TOKEN=change-me-super-secret-buraya-guclu-sifre-yaz
+
+# Kendi domain adresinizle değiştirin:
+APP_URL=https://ops.siteniz.com
+NEXT_PUBLIC_APP_URL=https://ops.siteniz.com

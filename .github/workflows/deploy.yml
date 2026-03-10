@@ -1,0 +1,59 @@
+name: Build & Deploy to cPanel
+
+on:
+  push:
+    branches:
+      - main   # main branch'e push edildiğinde tetiklenir
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Kodu çek
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Node.js 22 kur (better-sqlite3 için doğru ABI)
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      # 3. Bağımlılıkları yükle (better-sqlite3 otomatik Linux için derlenir)
+      - name: Install dependencies
+        run: npm ci
+
+      # 4. Next.js standalone build
+      - name: Build application
+        run: npm run build
+        env:
+          NODE_ENV: production
+          NEXT_PUBLIC_APP_URL: ${{ secrets.APP_URL }}
+
+      # 5. public/ klasörünü standalone'a kopyala (statik dosyalar)
+      - name: Copy public assets to standalone
+        run: |
+          cp -r public .next/standalone/public
+
+      # 6. data/ klasörünü yarat (veritabanı placeholder — cPanel'de varsa üzerine yazılmaz)
+      - name: Prepare data directory placeholder
+        run: mkdir -p .next/standalone/data
+
+      # 7. FTP ile cPanel'e yükle (data/ hariç — veritabanını silmemek için)
+      - name: Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: .next/standalone/
+          server-dir: ${{ secrets.FTP_SERVER_DIR }}
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/.cache/**
+            data/*.sqlite
+            data/*.sqlite-shm
+            data/*.sqlite-wal
